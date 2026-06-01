@@ -1419,6 +1419,70 @@
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
+    /* =====================================================
+       PRESENTATION MODAL
+    ===================================================== */
+    .pres-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+    }
+    .pres-modal-overlay.open { display: flex; }
+    .pres-modal {
+      position: relative;
+      width: 96vw;
+      height: 92vh;
+      max-width: 1200px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid rgba(124,111,255,0.25);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    }
+    .pres-modal iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .pres-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 10;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(15,13,40,0.85);
+      border: 1px solid rgba(124,111,255,0.35);
+      color: var(--text-1);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .pres-modal-close:hover { background: rgba(124,111,255,0.3); transform: scale(1.1); }
+    .case-pres-btn {
+      font-size: 0.82rem;
+      color: var(--text-1);
+      background: var(--gradient);
+      border: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .case-pres-btn:hover { opacity: 0.88; transform: translateY(-1px); }
   </style>
 </head>
 <body>
@@ -1607,19 +1671,19 @@
         <div class="case-card reveal d1">
           <div class="case-thumb">
             <div class="case-thumb-bg"></div>
-            <div class="case-thumb-icon">🤖</div>
+            <div class="case-thumb-icon">💅</div>
           </div>
           <div class="case-body">
-            <span class="case-tag">Telegram-бот</span>
-            <h3 class="case-title">Бот для записи клиентов</h3>
-            <p class="case-client">Сервисный бизнес · Автоматизация записи</p>
+            <span class="case-tag">Лендинг + Telegram-бот</span>
+            <h3 class="case-title">Beauty Studio — система записи</h3>
+            <p class="case-client">Салон красоты · <a href="https://anibeauty.ru/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">anibeauty.ru</a></p>
             <div class="case-result">
-              <strong>80% вопросов</strong> обрабатывает бот. Время ответа —
-              <strong>с 4 часов до 2 минут</strong>.
+              Клиент нажимает «Записаться» — <strong>бот записывает сам</strong>.
+              Администратор освобождён от <strong>3 часов переписки</strong> в день. Работает 24/7.
             </div>
             <div class="case-foot">
-              <span class="case-days">⏱ 6 дней</span>
-              <a href="#contact" class="case-link">Похожая задача →</a>
+              <span class="case-days">⏱ 3–5 дней</span>
+              <button class="case-pres-btn" onclick="openPres('beauty-studio-presentation.html')">Смотреть кейс →</button>
             </div>
           </div>
         </div>
@@ -1627,19 +1691,19 @@
         <div class="case-card reveal d2">
           <div class="case-thumb">
             <div class="case-thumb-bg"></div>
-            <div class="case-thumb-icon">🚀</div>
+            <div class="case-thumb-icon">✍️</div>
           </div>
           <div class="case-body">
-            <span class="case-tag">Лендинг</span>
-            <h3 class="case-title">Лендинг для онлайн-продукта</h3>
-            <p class="case-client">Образовательный проект · Сбор заявок</p>
+            <span class="case-tag">AI-агент · Telegram-бот</span>
+            <h3 class="case-title">AI-Копирайтер</h3>
+            <p class="case-client">Контент-маркетинг · Автоматизация постинга</p>
             <div class="case-result">
-              <strong>34 заявки</strong> в первую неделю. Форма и автоответы —
-              за <strong>1 день</strong>.
+              Пишет посты <strong>в стиле автора</strong>. Команда из 5 AI-агентов.
+              Ищет тренды и генерирует идеи <strong>24/7 без усталости</strong>.
             </div>
             <div class="case-foot">
-              <span class="case-days">⏱ 3 дня</span>
-              <a href="#contact" class="case-link">Похожая задача →</a>
+              <span class="case-days">⏱ 7 дней</span>
+              <button class="case-pres-btn" onclick="openPres('copywriter-bot-presentation.html')">Смотреть кейс →</button>
             </div>
           </div>
         </div>
@@ -1647,19 +1711,19 @@
         <div class="case-card reveal d3">
           <div class="case-thumb">
             <div class="case-thumb-bg"></div>
-            <div class="case-thumb-icon">🧠</div>
+            <div class="case-thumb-icon">🎯</div>
           </div>
           <div class="case-body">
-            <span class="case-tag">AI-агент</span>
-            <h3 class="case-title">AI-агент поддержки клиентов</h3>
-            <p class="case-client">Интернет-магазин · Обработка входящих</p>
+            <span class="case-tag">AI-агент · Мониторинг</span>
+            <h3 class="case-title">LeadHunter — охотник за лидами</h3>
+            <p class="case-client">Поиск клиентов · Мониторинг Telegram-каналов</p>
             <div class="case-result">
-              <strong>70% запросов</strong> закрывается автоматически. Время:
-              <strong>с 2 мин до 8 сек</strong>.
+              Сканирует <strong>16 каналов каждые 30 мин</strong>.
+              В день запуска — <strong>25 карточек лидов</strong>. Работает без остановок.
             </div>
             <div class="case-foot">
-              <span class="case-days">⏱ 8 дней</span>
-              <a href="#contact" class="case-link">Похожая задача →</a>
+              <span class="case-days">⏱ Запущен 19.05.2026</span>
+              <button class="case-pres-btn" onclick="openPres('leadhunter-presentation.html')">Смотреть кейс →</button>
             </div>
           </div>
         </div>
@@ -2016,6 +2080,14 @@
   <!-- — Back to Top ————————————————————————————————————— -->
   <button class="back-to-top" id="backToTop" aria-label="Вернуться наверх">↑</button>
 
+  <!-- — Presentation Modal ————————————————————————————— -->
+  <div class="pres-modal-overlay" id="presOverlay">
+    <div class="pres-modal">
+      <button class="pres-modal-close" id="presClose" aria-label="Закрыть">✕</button>
+      <iframe id="presFrame" src="" title="Презентация проекта"></iframe>
+    </div>
+  </div>
+
   <!-- ————————————————————————————————————————————————————
        JAVASCRIPT
   ———————————————————————————————————————————————————— -->
@@ -2199,6 +2271,23 @@
         card.style.transition = 'transform .5s cubic-bezier(.23,1,.32,1)';
       });
     });
+
+    const presOverlay = document.getElementById('presOverlay');
+    const presFrame   = document.getElementById('presFrame');
+    const presClose   = document.getElementById('presClose');
+    window.openPres = function(file) {
+      presFrame.src = file;
+      presOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+    function closePres() {
+      presOverlay.classList.remove('open');
+      presFrame.src = '';
+      document.body.style.overflow = '';
+    }
+    presClose.addEventListener('click', closePres);
+    presOverlay.addEventListener('click', e => { if (e.target === presOverlay) closePres(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePres(); });
 
     const pxLayers = document.querySelectorAll('.px-layer');
     if (pxLayers.length) {

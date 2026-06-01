@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Копирайтер — Презентация</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #100b04;
+  --bg2:      #1a1209;
+  --bg3:      #231808;
+  --gold:     #f5a623;
+  --amber:    #e8840a;
+  --purple:   #c47bff;
+  --rose:     #ff7eb3;
+  --cream:    #fff8ec;
+  --muted:    rgba(255,248,236,0.45);
+  --card:     rgba(255,255,255,0.04);
+  --border:   rgba(245,166,35,0.18);
+  --grad:     linear-gradient(135deg, #f5a623, #c47bff);
+  --grad2:    linear-gradient(135deg, #e8840a, #f5a623);
+  --grad3:    linear-gradient(135deg, #c47bff, #ff7eb3);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  width: 100%;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  user-select: none;
+}
+
+/* ── GRAIN ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9998;
+  mix-blend-mode: overlay;
+}
+
+/* ── AMBIENT GLOW ── */
+.glow-a, .glow-b, .glow-c {
+  position: fixed; border-radius: 50%;
+  filter: blur(140px); pointer-events: none; z-index: 0;
+  transition: opacity 1.2s ease;
+}
+.glow-a {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(245,166,35,0.09) 0%, transparent 70%);
+  top: -250px; left: -200px;
+}
+.glow-b {
+  width: 550px; height: 550px;
+  background: radial-gradient(circle, rgba(196,123,255,0.08) 0%, transparent 70%);
+  bottom: -200px; right: -150px;
+}
+.glow-c {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(232,132,10,0.06) 0%, transparent 70%);
+  top: 40%; left: 50%; transform: translate(-50%,-50%);
+}
+
+/* ── NAVIGATION ── */
+.slide-counter {
+  position: fixed; top: 28px; right: 36px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px; letter-spacing: 2px;
+  color: var(--muted); z-index: 100;
+}
+.slide-counter span { color: var(--gold); }
+
+.dots {
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 100;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted);
+  cursor: pointer;
+  transition: background .3s, transform .3s, width .3s;
+  border: none; outline: none;
+}
+.dot.active {
+  background: var(--gold);
+  width: 22px; border-radius: 3px;
+  transform: scaleY(1.2);
+}
+
+.arrow {
+  position: fixed; top: 50%; z-index: 100;
+  width: 44px; height: 44px;
+  border-radius: 50%; border: 1px solid var(--border);
+  background: rgba(16,11,4,0.7);
+  backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transform: translateY(-50%);
+  transition: background .2s, border-color .2s, opacity .3s;
+  color: var(--muted);
+}
+.arrow:hover { background: rgba(245,166,35,0.12); border-color: var(--gold); color: var(--cream); }
+.arrow.left { left: 24px; }
+.arrow.right { right: 24px; }
+.arrow.hidden { opacity: 0; pointer-events: none; }
+.arrow svg { width: 18px; height: 18px; }
+
+/* ── SLIDES ── */
+.deck { width: 100vw; }
+
+.slide {
+  min-height: 100vh; width: 100%;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 60px 80px;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .slide { padding: 50px 28px; }
+  .arrow { display: none; }
+}
+
+/* ── TYPOGRAPHY ── */
+.label {
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); font-weight: 600; margin-bottom: 16px;
+  font-family: 'Space Mono', monospace;
+  text-shadow: 0 0 16px rgba(245,166,35,0.6);
+}
+
+.display {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(56px, 9vw, 108px);
+  font-weight: 900; line-height: 0.95;
+  letter-spacing: -2px;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: clamp(32px, 4.5vw, 56px);
+  font-weight: 700; line-height: 1.1; letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--muted); font-weight: 300; line-height: 1.6;
+  max-width: 560px;
+}
+
+/* ── BADGE ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px; border-radius: 100px;
+  border: 1px solid rgba(245,166,35,0.35);
+  background: rgba(245,166,35,0.08);
+  font-size: 13px; font-weight: 600; color: var(--gold);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+}
+.badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  backdrop-filter: blur(12px);
+  transition: border-color .3s, transform .3s, box-shadow .3s;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(245,166,35,0.04), transparent 60%);
+  pointer-events: none;
+}
+.card:hover {
+  border-color: rgba(245,166,35,0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(245,166,35,0.08);
+}
+
+/* ── REVEAL ANIMATION ── */
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ═══════════════════════════════════════
+   SLIDE 1 — HERO
+═══════════════════════════════════════ */
+#s1 { text-align: center; gap: 28px; }
+
+.hero-badge { margin-bottom: 8px; }
+
+.hero-title { margin-bottom: 4px; }
+
+.hero-sub {
+  font-size: clamp(18px, 2.2vw, 26px);
+  color: var(--muted); font-weight: 300; line-height: 1.5;
+  max-width: 620px;
+}
+.hero-sub b { color: var(--cream); font-weight: 500; }
+
+.hero-decor {
+  position: absolute;
+  font-size: 220px; line-height: 1;
+  color: rgba(245,166,35,0.025);
+  font-family: 'Playfair Display', serif;
+  font-weight: 900; pointer-events: none;
+  user-select: none;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  white-space: nowrap;
+}
+
+/* float animation */
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+.float { animation: float 5s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════
+   SLIDE 2 — PROBLEM
+═══════════════════════════════════════ */
+#s2 { gap: 48px; }
+.problem-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 24px; width: 100%; max-width: 900px;
+}
+@media (max-width: 768px) {
+  .problem-grid { grid-template-columns: 1fr; }
+}
+
+.problem-card .icon {
+  font-size: 42px; margin-bottom: 20px; display: block;
+  filter: grayscale(0.2);
+}
+.problem-card h3 {
+  font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--cream);
+}
+.problem-card p { font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+.pain-stat {
+  font-family: 'Space Mono', monospace;
+  font-size: 48px; font-weight: 700;
+  background: var(--grad); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 6px;
+}
+
+/* ═══════════════════════════════════════
+   SLIDE 3 — SOLUTION
+═══════════════════════════════════════ */
+#s3 { gap: 0; }
+.solution-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 64px; align-items: center; width: 100%; max-width: 1000px;
+}
+@media (max-width: 768px) {
+  .solution-layout { grid-template-columns: 1fr; gap: 40px; }
+}
+.solution-points { display: flex; flex-direction: column; gap: 24px; }
+.solution-point {
+  display: flex; gap: 18px; align-items: flex-start;
+}
+.solution-point .bullet {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.solution-point h4 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.solution-point p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+/* Phone mockup */
+.phone-wrap {
+  display: flex; justify-content: center; align-items: center;
+}
+.phone {
+  width: 220px; height: 420px;
+  background: #1e140a;
+  border-radius: 36px;
+  border: 2px solid rgba(245,166,35,0.3);
+  padding: 18px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+  box-shadow: 0 0 60px rgba(245,166,35,0.1), 0 40px 80px rgba(0,0,0,0.5);
+}
+.phone-notch {
+  width: 60px; height: 6px; background: rgba(245,166,35,0.25);
+  border-radius: 3px; margin: 0 auto 8px;
+}
+.phone-msg {
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: 12px; padding: 10px 12px;
+  font-size: 10px; color: var(--cream); line-height: 1.5;
+}
+.phone-btn-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.phone-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(245,166,35,0.15);
+  border-radius: 8px; padding: 7px 8px;
+  font-size: 9px; color: var(--muted); text-align: center;
+}
+.phone-btn.wide { grid-column: 1/-1; background: rgba(245,166,35,0.08); color: var(--gold); }
+
+/* ═══════════════════════════════════════
+   SLIDE 4 — AGENTS
+═══════════════════════════════════════ */
+#s4 { gap: 48px; }
+.agents-grid {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  justify-content: center; max-width: 1000px; width: 100%;
+}
+.agent-card {
+  flex: 1; min-width: 160px; max-width: 180px;
+  text-align: center; padding: 28px 20px;
+}
+.agent-icon {
+  width: 64px; height: 64px; border-radius: 18px;
+  margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  border: 1px solid transparent;
+}
+.agent-card:nth-child(1) .agent-icon { background: rgba(245,166,35,0.12); border-color: rgba(245,166,35,0.3); }
+.agent-card:nth-child(2) .agent-icon { background: rgba(64,200,255,0.1); border-color: rgba(64,200,255,0.3); }
+.agent-card:nth-child(3) .agent-icon { background: rgba(196,123,255,0.1); border-color: rgba(196,123,255,0.3); }
+.agent-card:nth-child(4) .agent-icon { background: rgba(255,126,179,0.1); border-color: rgba(255,126,179,0.3); }
+.agent-card:nth-child(5) .agent-icon { background: rgba(232,132,10,0.1); border-color: rgba(232,132,10,0.3); }
+
+.agent-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.agent-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.agents-arrow {
+  display: flex; align-items: center; gap: 12px;
+  color: rgba(245,166,35,0.4); font-size: 18px;
+  align-self: center;
+}
+
+/* ═══════════════════════════════════════
+   SLIDE 5 — FEATURES
+═══════════════════════════════════════ */
+#s5 { gap: 48px; }
+.features-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; max-width: 900px; width: 100%;
+}
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.feature-tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px 18px;
+  transition: border-color .3s, background .3s, transform .2s;
+  cursor: default;
+}
+.feature-tile:hover {
+  border-color: rgba(245,166,35,0.45);
+  background: rgba(245,166,35,0.06);
+  transform: scale(1.03);
+}
+.feature-emoji { font-size: 26px; margin-bottom: 10px; display: block; }
+.feature-tile h4 { font-size: 14px; font-weight: 600; color: var(--cream); }
+.feature-tile p { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+/* ═══════════════════════════════════════
+   SLIDE 6 — TRENDS
+═══════════════════════════════════════ */
+#s6 { gap: 56px; }
+.trends-layout {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px; max-width: 960px; width: 100%;
+}
+@media (max-width: 768px) { .trends-layout { grid-template-columns: 1fr; } }
+
+.trend-block h3 { font-size: 38px; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+.trend-block h3.gold { color: var(--gold); }
+.trend-block h3.purple { color: var(--purple); }
+.trend-block h3.rose { color: var(--rose); }
+.trend-block .trend-label { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 16px; }
+.trend-block p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+.trend-sources {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;
+}
+.source-pill {
+  padding: 4px 12px; border-radius: 100px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+}
+.source-pill.gold { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: var(--gold); }
+.source-pill.purple { background: rgba(196,123,255,0.1); border-color: rgba(196,123,255,0.3); color: var(--purple); }
+.source-pill.rose { background: rgba(255,126,179,0.1); border-color: rgba(255,126,179,0.3); color: var(--rose); }
+
+/* ═══════════════════════════════════════
+   SLIDE 7 — STACK
+═══════════════════════════════════════ */
+#s7 { gap: 48px; }
+.stack-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 20px; max-width: 800px; width: 100%;
+}
+@media (max-width: 768px) { .stack-grid { grid-template-columns: 1fr; } }
+
+.stack-item {
+  display: flex; gap: 20px; align-items: center;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px 24px;
+  transition: border-color .3s;
+}
+.stack-item:hover { border-color: rgba(245,166,35,0.4); }
+.stack-icon {
+  width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+  background: rgba(245,166,35,0.08);
+  border: 1px solid rgba(245,166,35,0.2);
+}
+.stack-item h4 { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+.stack-item p { font-size: 13px; color: var(--muted); }
+
+.tech-pills {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  max-width: 800px; width: 100%;
+}
+.tech-pill {
+  padding: 8px 20px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+  background: rgba(245,166,35,0.08);
+  border: 1px solid rgba(245,166,35,0.2);
+  color: var(--gold);
+  font-family: 'Space Mono', monospace;
+  transition: background .2s, border-color .2s;
+}
+.tech-pill:hover { background: rgba(245,166,35,0.15); border-color: rgba(245,166,35,0.5); }
+
+/* ═══════════════════════════════════════
+   SLIDE 8 — FINALE
+═══════════════════════════════════════ */
+#s8 { text-align: center; gap: 32px; }
+
+.finale-stat-row {
+  display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+  margin: 8px 0;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  background: var(--grad);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1;
+}
+.stat-lbl { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 18px 40px; border-radius: 100px;
+  background: var(--grad2);
+  border: none; cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 700; color: #100b04;
+  transition: opacity .2s, transform .2s, box-shadow .2s;
+  box-shadow: 0 8px 40px rgba(245,166,35,0.25);
+  letter-spacing: 0.3px;
+}
+.cta-btn:hover { opacity: 0.88; transform: scale(1.04); box-shadow: 0 12px 50px rgba(245,166,35,0.35); }
+
+.finale-caption { font-size: 15px; color: var(--muted); }
+.finale-caption b { color: var(--gold); }
+
+/* golden shimmer line */
+.shimmer-line {
+  height: 1px; width: 200px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%,100% { opacity: 0.3; transform: scaleX(0.7); }
+  50% { opacity: 1; transform: scaleX(1.2); }
+}
+
+/* divider */
+.divider {
+  height: 1px; background: var(--border);
+  width: 100%; max-width: 900px;
+}
+
+/* ── FINALE AUTHOR BLOCK ── */
+.final-author {
+  margin-top: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.final-author-name {
+  font-size: 12px; color: var(--muted);
+  font-family: 'Space Mono', monospace; letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.final-site-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 14px; font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: background .25s, border-color .25s, box-shadow .25s, transform .25s;
+}
+.final-site-btn:hover {
+  background: rgba(245,166,35,0.1);
+  border-color: var(--gold);
+  box-shadow: 0 0 24px rgba(245,166,35,0.2);
+  transform: translateY(-2px);
+}
+.final-site-btn svg { width: 14px; height: 14px; opacity: .65; }
+</style>
+</head>
+<body>
+
+<!-- ambient glow -->
+<div class="glow-a"></div>
+<div class="glow-b"></div>
+<div class="glow-c"></div>
+
+<!-- navigation -->
+<div class="slide-counter"><span id="cur">01</span> / <span id="tot">08</span></div>
+
+<div class="dots" id="dots"></div>
+
+<button class="arrow left hidden" id="arLeft" aria-label="Назад">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+</button>
+<button class="arrow right" id="arRight" aria-label="Вперёд">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</button>
+
+<div class="deck">
+
+  <!-- ══ SLIDE 1 — HERO ══ -->
+  <section class="slide" id="s1">
+    <div class="hero-decor">AI</div>
+
+    <div class="badge hero-badge reveal">Telegram Bot</div>
+
+    <div class="hero-title reveal reveal-delay-1">
+      <div class="display float">AI-Копирайтер</div>
+    </div>
+
+    <p class="hero-sub reveal reveal-delay-2">
+      <b>Пишет в твоём стиле.</b> Ищет тренды. Генерирует идеи.<br>Работает <b>24/7</b> — без усталости и прокрастинации.
+    </p>
+
+    <div class="shimmer-line reveal reveal-delay-3"></div>
+  </section>
+
+  <!-- ══ SLIDE 2 — PROBLEM ══ -->
+  <section class="slide" id="s2">
+    <div style="text-align:center; max-width:700px;">
+      <div class="label reveal">Проблема</div>
+      <h2 class="reveal reveal-delay-1">Контент требует<br>слишком много времени</h2>
+    </div>
+
+    <div class="problem-grid">
+      <div class="card problem-card reveal reveal-delay-2">
+        <span class="icon">💡</span>
+        <div class="pain-stat">0</div>
+        <h3>Идеи заканчиваются</h3>
+        <p>Каждый день нужно что-то писать, но голова пустая. Вдохновение приходит редко.</p>
+      </div>
+      <div class="card problem-card reveal reveal-delay-3">
+        <span class="icon">⏳</span>
+        <div class="pain-stat">3ч</div>
+        <h3>Нет времени писать</h3>
+        <p>Один качественный пост — это часы работы. А потом ещё редактура, правки, публикация.</p>
+      </div>
+      <div class="card problem-card reveal reveal-delay-4">
+        <span class="icon">🎭</span>
+        <div class="pain-stat">≠</div>
+        <h3>Теряется стиль</h3>
+        <p>Чужие тексты звучат чужо. Пост должен звучать как ты — иначе аудитория не чувствует автора.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 3 — SOLUTION ══ -->
+  <section class="slide" id="s3">
+    <div class="solution-layout">
+
+      <div style="display:flex;flex-direction:column;gap:32px;">
+        <div>
+          <div class="label reveal">Решение</div>
+          <h2 class="reveal reveal-delay-1">Твой личный<br>AI-копирайтер</h2>
+        </div>
+        <div class="solution-points">
+          <div class="solution-point reveal reveal-delay-2">
+            <div class="bullet">🧬</div>
+            <div>
+              <h4>Знает твой стиль</h4>
+              <p>Анализирует твои прошлые тексты и пишет так же — с твоей интонацией, словами, подходом.</p>
+            </div>
+          </div>
+          <div class="solution-point reveal reveal-delay-3">
+            <div class="bullet">✍️</div>
+            <div>
+              <h4>Пишет за тебя</h4>
+              <p>Просто скажи тему — получишь готовый пост. Или попроси идеи, план, улучшить черновик.</p>
+            </div>
+          </div>
+          <div class="solution-point reveal reveal-delay-4">
+            <div class="bullet">🔄</div>
+            <div>
+              <h4>Работает без выходных</h4>
+              <p>Запущен на сервере 24/7. Готов к работе в любой момент — ночью, в выходной, в отпуске.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-wrap reveal reveal-delay-2">
+        <div class="phone" style="animation: float 5s ease-in-out infinite; animation-delay: 0.5s;">
+          <div class="phone-notch"></div>
+          <div class="phone-msg">
+            Привет! Я твой AI-копирайтер 👋<br><br>Знаю твой стиль, аудиторию и нишу. Помогу писать посты, искать тренды и улучшать тексты.
+          </div>
+          <div class="phone-btn wide phone-btn">✍️ Написать пост</div>
+          <div class="phone-btn-grid">
+            <div class="phone-btn">💡 Идеи</div>
+            <div class="phone-btn">🔥 Тренды</div>
+            <div class="phone-btn">📅 Контент-план</div>
+            <div class="phone-btn">✨ Улучшить</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 4 — AGENTS ══ -->
+  <section class="slide" id="s4">
+    <div style="text-align:center;">
+      <div class="label reveal">Архитектура</div>
+      <h2 class="reveal reveal-delay-1">Команда AI-агентов</h2>
+      <p class="subtitle reveal reveal-delay-2" style="margin: 12px auto 0;">Мультиагентный подход — каждый текст проходит через 5 специалистов</p>
+    </div>
+
+    <div class="agents-grid">
+      <div class="card agent-card reveal reveal-delay-1">
+        <div class="agent-icon">🧬</div>
+        <h4>Аналитик стиля</h4>
+        <p>Изучает твои тексты, находит паттерны и хранит твой уникальный голос</p>
+      </div>
+      <div class="card agent-card reveal reveal-delay-2">
+        <div class="agent-icon">🔍</div>
+        <h4>Ресёрчер</h4>
+        <p>Ищет свежие данные, тренды и факты в интернете и соцсетях</p>
+      </div>
+      <div class="card agent-card reveal reveal-delay-3">
+        <div class="agent-icon">✍️</div>
+        <h4>Копирайтер</h4>
+        <p>Пишет первую версию текста с учётом стиля и найденных данных</p>
+      </div>
+      <div class="card agent-card reveal reveal-delay-4">
+        <div class="agent-icon">🖊️</div>
+        <h4>Редактор</h4>
+        <p>Улучшает структуру, убирает лишнее, делает текст более читаемым</p>
+      </div>
+      <div class="card agent-card reveal reveal-delay-5">
+        <div class="agent-icon">🎯</div>
+        <h4>Критик</h4>
+        <p>Проверяет качество, соответствие стилю и даёт финальную оценку</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 5 — FEATURES ══ -->
+  <section class="slide" id="s5">
+    <div style="text-align:center;">
+      <div class="label reveal">Возможности</div>
+      <h2 class="reveal reveal-delay-1">Всё для контента —<br>в одном боте</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-tile reveal reveal-delay-1">
+        <span class="feature-emoji">✍️</span>
+        <h4>Написать пост</h4>
+        <p>Готовый текст по теме в твоём стиле</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-1">
+        <span class="feature-emoji">🔥</span>
+        <h4>Тренды</h4>
+        <p>Актуальные темы из интернета прямо сейчас</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-2">
+        <span class="feature-emoji">💡</span>
+        <h4>Идеи</h4>
+        <p>Генерация идей для публикаций</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-2">
+        <span class="feature-emoji">📅</span>
+        <h4>Контент-план</h4>
+        <p>Недельный или месячный план постов</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-3">
+        <span class="feature-emoji">✨</span>
+        <h4>Улучшить текст</h4>
+        <p>Доработка и шлифовка черновика</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-3">
+        <span class="feature-emoji">🚀</span>
+        <h4>Усилить крючок</h4>
+        <p>Сделать первое предложение цепляющим</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-4">
+        <span class="feature-emoji">✂️</span>
+        <h4>Сократить</h4>
+        <p>Убрать лишнее без потери смысла</p>
+      </div>
+      <div class="feature-tile reveal reveal-delay-4">
+        <span class="feature-emoji">🎨</span>
+        <h4>Тон-оф-войс</h4>
+        <p>Настройка и сохранение фирменного стиля</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 6 — TRENDS ══ -->
+  <section class="slide" id="s6">
+    <div style="text-align:center;">
+      <div class="label reveal">Аналитика</div>
+      <h2 class="reveal reveal-delay-1">Следит за миром<br>вместо тебя</h2>
+    </div>
+
+    <div class="trends-layout">
+      <div class="card reveal reveal-delay-2" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="trend-block">
+          <h3 class="gold">🌐</h3>
+          <div class="trend-label">Поиск трендов</div>
+          <p>Сканирует интернет и соцсети в реальном времени. Находит что сейчас обсуждают в твоей нише.</p>
+        </div>
+        <div class="trend-sources">
+          <span class="source-pill gold">Telegram</span>
+          <span class="source-pill gold">Instagram</span>
+          <span class="source-pill gold">Google Trends</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-3" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="trend-block">
+          <h3 class="purple">👥</h3>
+          <div class="trend-label">Анализ аудитории</div>
+          <p>Изучает что волнует твою аудиторию. Предлагает темы, которые получат максимальный отклик.</p>
+        </div>
+        <div class="trend-sources">
+          <span class="source-pill purple">Интересы</span>
+          <span class="source-pill purple">Вопросы</span>
+          <span class="source-pill purple">Боли</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-4" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="trend-block">
+          <h3 class="rose">🖼️</h3>
+          <div class="trend-label">Генерация изображений</div>
+          <p>К каждому посту создаёт уникальное изображение. Визуал усиливает вовлечённость.</p>
+        </div>
+        <div class="trend-sources">
+          <span class="source-pill rose">AI-арт</span>
+          <span class="source-pill rose">Уникально</span>
+          <span class="source-pill rose">В стиле бренда</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 7 — STACK ══ -->
+  <section class="slide" id="s7">
+    <div style="text-align:center;">
+      <div class="label reveal">Технологии</div>
+      <h2 class="reveal reveal-delay-1">Построен на лучшем<br>AI-стеке</h2>
+    </div>
+
+    <div class="stack-grid">
+      <div class="stack-item reveal reveal-delay-1">
+        <div class="stack-icon">🤖</div>
+        <div>
+          <h4>Мультиагентная система</h4>
+          <p>5 специализированных агентов работают в команде</p>
+        </div>
+      </div>
+      <div class="stack-item reveal reveal-delay-2">
+        <div class="stack-icon">⚡</div>
+        <div>
+          <h4>Claude AI</h4>
+          <p>Мощнейшая языковая модель для генерации текстов</p>
+        </div>
+      </div>
+      <div class="stack-item reveal reveal-delay-3">
+        <div class="stack-icon">🔍</div>
+        <div>
+          <h4>Web Search</h4>
+          <p>Поиск актуальных трендов и данных в реальном времени</p>
+        </div>
+      </div>
+      <div class="stack-item reveal reveal-delay-4">
+        <div class="stack-icon">🎨</div>
+        <div>
+          <h4>Image Generation</h4>
+          <p>Создание уникальных изображений к каждому посту</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tech-pills reveal reveal-delay-5">
+      <span class="tech-pill">Python</span>
+      <span class="tech-pill">Telegram Bot API</span>
+      <span class="tech-pill">Claude API</span>
+      <span class="tech-pill">Multi-Agent</span>
+      <span class="tech-pill">VPS 24/7</span>
+      <span class="tech-pill">Web Scraping</span>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 8 — FINALE ══ -->
+  <section class="slide" id="s8">
+    <div class="label reveal">Итог</div>
+
+    <div class="reveal reveal-delay-1">
+      <div class="display">Готов писать<br>прямо сейчас</div>
+    </div>
+
+    <div class="finale-stat-row reveal reveal-delay-2">
+      <div class="stat-item">
+        <div class="stat-num" data-target="5">0</div>
+        <div class="stat-lbl">AI-агентов в команде</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-target="8">0</div>
+        <div class="stat-lbl">функций в боте</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" style="-webkit-text-fill-color: var(--gold); background: none;">24/7</div>
+        <div class="stat-lbl">работает без остановок</div>
+      </div>
+    </div>
+
+    <p class="subtitle reveal reveal-delay-3">
+      Бот уже запущен на сервере и ждёт тебя.<br>
+      Скажи тему — и через минуту у тебя будет готовый пост.
+    </p>
+
+    <div class="shimmer-line reveal reveal-delay-4" style="margin: 4px 0;"></div>
+
+    <div class="final-author reveal reveal-delay-5">
+      <span class="final-author-name">Светлана Курчева — AI Builder</span>
+      <a class="final-site-btn" href="https://my-landing-digit.vercel.app/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        my-landing-digit.vercel.app
+      </a>
+    </div>
+  </section>
+
+</div><!-- /deck -->
+
+<script>
+const TOTAL = 8;
+let current = 0;
+
+// Build dots
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('button');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => goTo(i));
+  dotsEl.appendChild(d);
+}
+
+const slides = document.querySelectorAll('.slide');
+const dotEls = document.querySelectorAll('.dot');
+const curEl  = document.getElementById('cur');
+const arLeft = document.getElementById('arLeft');
+const arRight= document.getElementById('arRight');
+
+function goTo(n) {
+  current = Math.max(0, Math.min(TOTAL-1, n));
+  slides[current].scrollIntoView({ behavior: 'smooth' });
+  update();
+}
+
+function update() {
+  dotEls.forEach((d,i) => d.classList.toggle('active', i === current));
+  curEl.textContent = String(current+1).padStart(2,'0');
+  arLeft.classList.toggle('hidden', current === 0);
+  arRight.classList.toggle('hidden', current === TOTAL-1);
+}
+
+arLeft.addEventListener('click',  () => goTo(current-1));
+arRight.addEventListener('click', () => goTo(current+1));
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') goTo(current+1);
+  if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  goTo(current-1);
+});
+
+// Touch swipe
+let touchY = 0;
+document.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; });
+document.addEventListener('touchend', e => {
+  const dy = touchY - e.changedTouches[0].clientY;
+  if (Math.abs(dy) > 50) goTo(current + (dy > 0 ? 1 : -1));
+});
+
+// Intersection observer — track current slide & reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) {
+      const idx = Array.from(slides).indexOf(en.target);
+      if (idx !== -1) { current = idx; update(); }
+    }
+  });
+}, { threshold: 0.5 });
+
+slides.forEach(s => io.observe(s));
+
+// Reveal on scroll
+const revealIO = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('visible'); }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal').forEach(el => revealIO.observe(el));
+
+// Counter animation
+function animateCounter(el, target, duration = 1400) {
+  const start = performance.now();
+  const update = (now) => {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * ease);
+    if (p < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+const counterIO = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting && en.target.dataset.target) {
+      animateCounter(en.target, parseInt(en.target.dataset.target));
+      counterIO.unobserve(en.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-target]').forEach(el => counterIO.observe(el));
+
+// Trigger reveals for first slide immediately
+setTimeout(() => {
+  document.querySelectorAll('#s1 .reveal').forEach(el => el.classList.add('visible'));
+}, 100);
+
+update();
+</script>
+</body>
+</html>
