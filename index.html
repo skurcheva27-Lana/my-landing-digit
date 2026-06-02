@@ -1421,6 +1421,161 @@
     }
 
     /* =====================================================
+       EARLY CLIENTS
+    ===================================================== */
+    .ec-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .ec-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-family: 'Courier New', monospace;
+      padding: 5px 14px;
+      border: 1px solid rgba(255,107,138,0.45);
+      border-radius: 4px;
+      color: var(--accent-pink);
+      margin-bottom: 20px;
+    }
+    .ec-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(124,111,255,0.22);
+      border-radius: var(--radius-lg);
+      padding: 48px 44px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ec-card::after {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 280px; height: 280px;
+      background: radial-gradient(ellipse, rgba(255,107,138,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .ec-lead {
+      font-size: 0.97rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+    .ec-benefits {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    .ec-benefit {
+      background: rgba(124,111,255,0.06);
+      border: 1px solid rgba(124,111,255,0.15);
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .ec-benefit-icon {
+      font-size: 1.7rem;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 12px rgba(124,111,255,0.4));
+    }
+    .ec-benefit-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+    .ec-benefit-desc {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.45;
+    }
+    .ec-divider {
+      height: 1px;
+      background: var(--card-border);
+      margin-bottom: 28px;
+    }
+    .ec-exchange {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .ec-exchange-label {
+      font-size: 0.8rem;
+      color: var(--text-3);
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .ec-exchange-sep {
+      color: var(--text-3);
+    }
+    .ec-exchange-value {
+      font-size: 0.97rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .ec-slots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: rgba(95,255,175,0.05);
+      border: 1px solid rgba(95,255,175,0.18);
+      border-radius: var(--radius-sm);
+      padding: 14px 24px;
+      margin-bottom: 32px;
+    }
+    .ec-slots-label {
+      font-size: 0.83rem;
+      color: var(--text-2);
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.06em;
+    }
+    .ec-dots {
+      display: flex;
+      gap: 7px;
+    }
+    .ec-dot {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(95,255,175,0.75);
+      animation: ec-pulse 2.2s ease-in-out infinite;
+    }
+    .ec-dot:nth-child(2) { animation-delay: 0.28s; }
+    .ec-dot:nth-child(3) { animation-delay: 0.56s; }
+    @keyframes ec-pulse {
+      0%,100% { opacity: 0.55; transform: scale(1); }
+      50%      { opacity: 1;    transform: scale(1.2); }
+    }
+    .ec-slots-count {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--green);
+      font-family: 'Courier New', monospace;
+    }
+    .ec-cta-wrap {
+      text-align: center;
+    }
+    .ec-cta {
+      font-size: 1.02rem;
+      padding: 15px 40px;
+    }
+    @media (max-width: 640px) {
+      .ec-card { padding: 30px 22px 28px; }
+      .ec-benefits { grid-template-columns: 1fr; gap: 14px; }
+      .ec-benefit { display: flex; align-items: center; gap: 14px; text-align: left; padding: 16px; }
+      .ec-benefit-icon { margin-bottom: 0; font-size: 1.5rem; flex-shrink: 0; }
+    }
+
+    /* =====================================================
        PRESENTATION MODAL
     ===================================================== */
     .pres-modal-overlay {
@@ -1937,6 +2092,72 @@
             <span class="about-tag">Cursor</span>
           </div>
           <a href="#cases" class="btn btn-secondary reveal d4">Посмотреть кейсы →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ————————————————————————————————————————————————————
+       08. EARLY CLIENTS
+  ———————————————————————————————————————————————————— -->
+  <section class="section-pad" id="early-clients">
+    <div class="container">
+      <div class="ec-wrap">
+
+        <div class="section-head reveal">
+          <div class="ec-badge">⚡ Ограниченное предложение</div>
+          <span class="section-tag">// 08 — Программа раннего старта</span>
+          <h2 class="section-title">3 проекта на <span class="gradient-text">особых условиях</span><span class="section-title-bar"></span></h2>
+        </div>
+
+        <div class="ec-card reveal">
+          <p class="ec-lead">
+            Я только выхожу на рынок и хочу собрать первые реальные кейсы.<br>
+            Поэтому предлагаю особые условия для трёх проектов:
+          </p>
+
+          <div class="ec-benefits">
+            <div class="ec-benefit">
+              <div class="ec-benefit-icon">💸</div>
+              <div class="ec-benefit-title">Скидка 40%</div>
+              <div class="ec-benefit-desc">от стандартной цены</div>
+            </div>
+            <div class="ec-benefit">
+              <div class="ec-benefit-icon">🎯</div>
+              <div class="ec-benefit-title">Личное внимание</div>
+              <div class="ec-benefit-desc">веду сама, без делегирования</div>
+            </div>
+            <div class="ec-benefit">
+              <div class="ec-benefit-icon">⚡</div>
+              <div class="ec-benefit-title">Результат за 3–7 дней</div>
+              <div class="ec-benefit-desc">как обычно, без компромиссов</div>
+            </div>
+          </div>
+
+          <div class="ec-divider"></div>
+
+          <div class="ec-exchange">
+            <span class="ec-exchange-label">Что прошу взамен</span>
+            <span class="ec-exchange-sep">—</span>
+            <span class="ec-exchange-value">Честный отзыв после запуска</span>
+          </div>
+
+          <div class="ec-slots">
+            <span class="ec-slots-label">Осталось мест</span>
+            <div class="ec-dots">
+              <div class="ec-dot"></div>
+              <div class="ec-dot"></div>
+              <div class="ec-dot"></div>
+            </div>
+            <span class="ec-slots-count">3 из 3</span>
+          </div>
+
+          <div class="ec-cta-wrap">
+            <a href="https://t.me/svetlana_vibecoder" target="_blank" rel="noopener" class="btn btn-primary ec-cta">
+              Написать в Telegram →
+            </a>
+          </div>
         </div>
 
       </div>
